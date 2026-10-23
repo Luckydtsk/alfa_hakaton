@@ -1,0 +1,97 @@
+{
+  "numeric_features": [
+    "loan_amount",
+    "term_months",
+    "jobs_supported"
+  ],
+  "categorical_features": [
+    "naics_sector",
+    "business_type",
+    "business_age",
+    "collateral",
+    "revolver",
+    "franchise"
+  ],
+  "feature_order": [
+    "loan_amount",
+    "term_months",
+    "jobs_supported",
+    "naics_sector",
+    "business_type",
+    "business_age",
+    "collateral",
+    "revolver",
+    "franchise"
+  ],
+  "jobs_cap": 100.0,
+  "jobs_median": 5.0,
+  "naics_sectors_kept": [
+    "11",
+    "21",
+    "23",
+    "31",
+    "32",
+    "33",
+    "42",
+    "44",
+    "45",
+    "48",
+    "49",
+    "51",
+    "52",
+    "53",
+    "54",
+    "56",
+    "61",
+    "62",
+    "71",
+    "72",
+    "81"
+  ],
+  "business_age_values": [
+    "existing_5y_plus",
+    "age_2_to_5",
+    "under_2y",
+    "startup",
+    "unknown"
+  ],
+  "business_type_values": [
+    "CORPORATION",
+    "INDIVIDUAL",
+    "PARTNERSHIP",
+    "unknown"
+  ],
+  "amount_unit": "USD",
+  "amount_percentiles_usd": {
+    "p05": 10000.0,
+    "p25": 30400.0,
+    "p50": 100000.0,
+    "p75": 339000.0,
+    "p95": 1500000.0
+  },
+  "target": "pd_chargeoff",
+  "target_meaning": "Probability that a resolved SBA 7(a) loan is charged off.",
+  "risk_score": "Integer 0-1000. Higher is safer: round((1 - pd_chargeoff) * 1000).",
+  "data": "U.S. SBA 7(a) FOIA, approvals FY2010-FY2019, file as of 2026-06-30.",
+  "trained_on": "Resolved loans (PIF or CHGOFF) approved in FY2010-FY2015.",
+  "validated_on": "FY2016",
+  "tested_on": "FY2017",
+  "excluded_from_fit": [
+    "Terms that are not a multiple of 12 months. They contain about 90% of charge-offs and do not match standard loan products.",
+    "FY2018-FY2019, because SBA replaced the business-age categories in calendar 2018",
+    "InitialInterestRate, because the lender set it from its own risk view",
+    "BankName, GrossChargeOffAmount, ChargeOffDate, PaidInFullDate",
+    "Open, cancelled, and not-yet-disbursed loans"
+  ],
+  "inputs": {
+    "loan_amount": "Approved amount in US dollars. Rubles are a different scale.",
+    "term_months": "Contract term in months, 1 to 360.",
+    "naics_code": "NAICS code or its first two digits.",
+    "business_type": "CORPORATION, INDIVIDUAL, or PARTNERSHIP. ООО maps to CORPORATION, ИП to INDIVIDUAL.",
+    "business_age": "existing_5y_plus, age_2_to_5, under_2y, startup, or unknown.",
+    "jobs_supported": "Number of jobs supported.",
+    "collateral": "yes or no.",
+    "revolver": "yes for a revolving line, no for a term loan.",
+    "franchise": "yes or no."
+  }
+}

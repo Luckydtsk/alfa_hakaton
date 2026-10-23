@@ -1,0 +1,7 @@
+# Local dataset, virtualenv, and training runs. The model loaded by the app is in scoring/.
+training/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.env
