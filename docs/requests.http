@@ -1,0 +1,23 @@
+@base = http://localhost:8080
+
+### login
+POST {{base}}/api/login
+Content-Type: application/json
+
+{
+  "login": "client.good",
+  "password": "demo"
+}
+
+### me
+GET {{base}}/api/me
+
+### applications
+GET {{base}}/api/applications
+
+### prepare documents
+# Подставьте id заявки client.good
+POST {{base}}/api/applications/1/prepare-documents
+
+### fund
+POST {{base}}/api/applications/1/fund

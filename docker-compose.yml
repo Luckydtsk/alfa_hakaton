@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cabinet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cabinet}
+      POSTGRES_DB: cabinet
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cabinet -d cabinet"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  scoring:
+    build:
+      context: .
+      dockerfile: scoring/Dockerfile
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://cabinet:${POSTGRES_PASSWORD:-cabinet}@postgres:5432/cabinet
+      SCORING_URL: http://scoring:8000
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      scoring:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    ports:
+      - "${WEB_PUBLISH:-8080}:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

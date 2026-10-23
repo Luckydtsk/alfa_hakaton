@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Кабинет финансирования
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/health:
+    get:
+      summary: Проверка, что API отвечает
+      responses:
+        "200":
+          description: ok
+  /api/meta:
+    get:
+      summary: Справочники отраслей, целей, продуктов и пороги
+      responses:
+        "200":
+          description: справочники
+  /api/login:
+    post:
+      summary: Вход по логину и паролю, ставит cookie sid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: пользователь
+        "401":
+          description: неверная пара
+  /api/logout:
+    post:
+      summary: Завершает сессию
+      responses:
+        "200":
+          description: ok
+  /api/me:
+    get:
+      summary: Текущий пользователь
+      responses:
+        "200":
+          description: профиль
+        "401":
+          description: нет сессии
+  /api/applications:
+    get:
+      summary: Заявки клиента или все заявки сотрудника
+      responses:
+        "200":
+          description: список
+    post:
+      summary: Создать заявку и сразу провести её по конвейеру
+      responses:
+        "201":
+          description: заявка с решением
+  /api/applications/{id}:
+    get:
+      summary: Карточка заявки
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: заявка
+  /api/applications/{id}/supplement:
+    post:
+      summary: Дополнить заявку в статусе need_info и пересчитать решение
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: обновлённая заявка
+  /api/applications/{id}/accept-offer:
+    post:
+      summary: Клиент принимает другие условия
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: заявка становится approved
+  /api/applications/{id}/decline-offer:
+    post:
+      summary: Клиент отказывается от других условий
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: заявка становится rejected
+  /api/applications/{id}/prepare-documents:
+    post:
+      summary: Смоделировать пакет документов
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: documents_ready
+  /api/applications/{id}/fund:
+    post:
+      summary: Смоделировать выдачу
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: funded
+  /api/applications/{id}/decide:
+    post:
+      summary: Решение сотрудника по серой заявке
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, comment]
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject, need_info, counteroffer]
+                comment: { type: string }
+                amountRub: { type: number }
+                termMonths: { type: integer }
+                product:
+                  type: string
+                  enum: [working_capital, equipment]
+      responses:
+        "200":
+          description: обновлённая заявка
