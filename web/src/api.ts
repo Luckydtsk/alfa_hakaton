@@ -39,8 +39,17 @@ export type Application = {
   riskScore: number | null;
   rules: string[];
   mocks: {
-    registry: { exists: boolean; status: string; registeredAt: string; name: string };
-    bureau: { openLoans: number; hasDelinquency: boolean; monthlyPaymentRub: number };
+    registry: {
+      exists: boolean;
+      status: string;
+      registeredAt: string;
+      name: string;
+    };
+    bureau: {
+      openLoans: number;
+      hasDelinquency: boolean;
+      monthlyPaymentRub: number;
+    };
     transparent: { director: string; okved: string };
   } | null;
   offer: Offer | null;
@@ -57,9 +66,24 @@ export type Meta = {
   industries: { code: string; label: string; naics: string }[];
   ages: { code: string; label: string }[];
   goals: { code: string; label: string; product: string }[];
-  products: { code: string; label: string; maxAmountRub: number; maxTermMonths: number; collateralRequired: boolean }[];
+  products: {
+    code: string;
+    label: string;
+    maxAmountRub: number;
+    maxTermMonths: number;
+    collateralRequired: boolean;
+  }[];
   terms: number[];
 };
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+  }
+}
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
@@ -71,8 +95,13 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     credentials: "include",
   });
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as { error?: string };
-    throw new Error(body.error || "Не удалось выполнить запрос");
+    const body = (await response.json().catch(() => ({}))) as {
+      error?: string;
+    };
+    throw new ApiError(
+      body.error || "Не удалось выполнить запрос",
+      response.status,
+    );
   }
   return response.json() as Promise<T>;
 }
@@ -93,10 +122,17 @@ export const STATUS_LABEL: Record<string, string> = {
 
 export function rub(value: number | null | undefined): string {
   if (value == null) return "—";
-  return new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 export function pct(value: number | null | undefined): string {
   if (value == null) return "—";
-  return new Intl.NumberFormat("ru-RU", { style: "percent", maximumFractionDigits: 1 }).format(value);
+  return new Intl.NumberFormat("ru-RU", {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
