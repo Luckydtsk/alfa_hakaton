@@ -106,6 +106,16 @@ function AuthLayout({
   );
 }
 
+const ACCOUNTS = [
+  ["client.good", "Одобрение и выдача"],
+  ["client.cafe", "Отказ по модели"],
+  ["client.thin", "Нужны данные"],
+  ["client.border", "Другие условия"],
+  ["client.closed", "Отказ: ликвидация"],
+  ["client.gray", "Серая зона"],
+  ["bank.underwriter", "Сотрудник банка"],
+] as const;
+
 export function LoginPage() {
   const cabinet = useCabinet(),
     navigate = useNavigate(),
@@ -116,6 +126,12 @@ export function LoginPage() {
     event.preventDefault();
     void operation.run(async () => {
       const user = await cabinet.login(login, password);
+      navigate(user.role === "bank" ? "/bank" : "/app");
+    });
+  }
+  function enter(nextLogin: string) {
+    void operation.run(async () => {
+      const user = await cabinet.login(nextLogin, "demo");
       navigate(user.role === "bank" ? "/bank" : "/app");
     });
   }
@@ -166,6 +182,24 @@ export function LoginPage() {
             </Button>
           </Stack>
         </form>
+        <div style={{ borderTop: "1px solid var(--line)", paddingTop: 24 }}>
+          <Stack gap={10}>
+            <h3 style={{ fontSize: 16 }}>Проверка для жюри</h3>
+            <Muted>Пароль у всех demo. Эти входы идут в API и модель.</Muted>
+            {ACCOUNTS.map(([value, label]) => (
+              <Button
+                key={value}
+                variant="secondary"
+                disabled={operation.busy}
+                onClick={() => enter(value)}
+                style={{ justifyContent: "space-between" }}
+              >
+                <span>{label}</span>
+                <span style={{ color: "var(--muted)", fontWeight: 500 }}>{value}</span>
+              </Button>
+            ))}
+          </Stack>
+        </div>
         <Muted>
           Нет аккаунта?{" "}
           <Link to="/register" style={{ color: "var(--ink)" }}>

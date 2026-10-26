@@ -21,17 +21,21 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 36
+      start_period: 40s
 
   api:
     build:
       context: .
       dockerfile: api/Dockerfile
-    env_file: .env
     environment:
       DATABASE_URL: postgres://cabinet:${POSTGRES_PASSWORD:-cabinet}@postgres:5432/cabinet
       SCORING_URL: http://scoring:8000
       PORT: 3000
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-before-the-demo}
+      FX_RUB_PER_USD: ${FX_RUB_PER_USD:-90}
+      PD_APPROVE: ${PD_APPROVE:-0.03}
+      PD_REVIEW: ${PD_REVIEW:-0.12}
     depends_on:
       postgres:
         condition: service_healthy

@@ -9,9 +9,10 @@
 Нужны Docker Engine и плагин Compose.
 
 ```bash
-cp .env.example .env
 docker compose up --build
 ```
+
+Файл `.env` не обязателен: пароль базы, секрет сессии и курс уже заданы в Compose. Чтобы заменить их, скопируйте `.env.example` в `.env` до запуска.
 
 Кабинет: http://localhost:8080
 
